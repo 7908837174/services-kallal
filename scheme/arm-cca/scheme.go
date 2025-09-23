@@ -5,7 +5,7 @@ package arm_cca
 const (
 	// SchemeName follows the format: <VENDOR>_<TECHNOLOGY>_<VARIANT>
 	SchemeName = "ARM_CCA"
-	
+
 	// Plugin name constants following the format: veraison/<scheme>/<handler-type>
 	EvidenceHandlerName    = "veraison/arm-cca/evidence"
 	EndorsementHandlerName = "veraison/arm-cca/endorsement"

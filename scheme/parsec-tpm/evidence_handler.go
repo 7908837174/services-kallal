@@ -62,7 +62,7 @@ func (s EvidenceHandler) ExtractClaims(
 	token *proto.AttestationToken,
 	trustAnchors []string,
 ) (map[string]interface{}, error) {
-	var evidence    tpm.Evidence
+	var evidence tpm.Evidence
 
 	err := evidence.FromCBOR(token.Data)
 	if err != nil {

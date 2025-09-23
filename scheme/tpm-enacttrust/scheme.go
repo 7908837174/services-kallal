@@ -5,7 +5,7 @@ package tpm_enacttrust
 const (
 	// SchemeName follows the format: <VENDOR>_<TECHNOLOGY>_<VARIANT>
 	SchemeName = "TPM_ENACTTRUST"
-	
+
 	// Plugin name constants following the format: veraison/<scheme>/<handler-type>
 	EvidenceHandlerName    = "veraison/tpm-enacttrust/evidence"
 	EndorsementHandlerName = "veraison/tpm-enacttrust/endorsement"

@@ -123,4 +123,3 @@ func tpmLookupKey(scope, tenantID, class, instance string) string {
 
 	return u.String()
 }
-
