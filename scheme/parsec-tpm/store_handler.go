@@ -19,7 +19,7 @@ import (
 type StoreHandler struct{}
 
 func (s StoreHandler) GetName() string {
-	return "parsec-tpm-store-handler"
+	return StoreHandlerName
 }
 
 func (s StoreHandler) GetAttestationScheme() string {
