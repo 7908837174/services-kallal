@@ -135,8 +135,22 @@ def generate_evidence(scheme, evidence, nonce, signing, outname):
                 )
     elif scheme == 'cca' and nonce:
         claims_file = f'{GENDIR}/claims/{scheme}.{evidence}.json'
-        # convert nonce from base64url to base64
-        translated_nonce = nonce.replace('-', '+').replace('_', '/')
+        # Handle nonce format: could be base64url (from test config) or base64 (from session response)
+        import base64
+        try:
+            # First try to decode as base64url (test config format)
+            decoded_nonce = base64.urlsafe_b64decode(nonce)
+            # Re-encode as standard base64 for evidence
+            translated_nonce = base64.b64encode(decoded_nonce).decode()
+        except Exception:
+            try:
+                # If that fails, try as standard base64 (session response format)
+                decoded_nonce = base64.b64decode(nonce)
+                # Already in standard base64 format
+                translated_nonce = nonce
+            except Exception:
+                # If both fail, fallback to simple character replacement
+                translated_nonce = nonce.replace('-', '+').replace('_', '/')
         update_json(
                 f'data/claims/{scheme}.{evidence}.json',
                 {'cca-realm-delegated-token': {f'cca-realm-challenge': translated_nonce}},
