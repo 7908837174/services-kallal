@@ -180,8 +180,56 @@ def _extract_submods_from_dict(response_data, key_file):
     """Extract submods from a dictionary/Box object instead of a response object"""
     result = None
     
-    # Try different ways to extract the result
+    # Debug: Print response structure
+    print(f"DEBUG _extract_submods_from_dict: response_data type: {type(response_data)}")
     if isinstance(response_data, dict):
+        print(f"DEBUG _extract_submods_from_dict: response_data keys: {list(response_data.keys())}")
+        
+        # Check if this is a raw HTTP response object with '_content'
+        if '_content' in response_data:
+            print("DEBUG _extract_submods_from_dict: Found raw HTTP response, extracting _content")
+            try:
+                import json
+                content_bytes = response_data['_content']
+                if isinstance(content_bytes, bytes):
+                    content_str = content_bytes.decode('utf-8')
+                else:
+                    content_str = str(content_bytes)
+                print(f"DEBUG _extract_submods_from_dict: Content string: {content_str[:500]}...")
+                
+                # Try to parse as JSON
+                content_json = json.loads(content_str)
+                print(f"DEBUG _extract_submods_from_dict: Parsed JSON keys: {list(content_json.keys()) if isinstance(content_json, dict) else 'Not a dict'}")
+                
+                # Now look for attestation result in the parsed content
+                if isinstance(content_json, dict):
+                    if "result" in content_json:
+                        result = content_json["result"]
+                        print(f"DEBUG _extract_submods_from_dict: Found 'result' in content_json")
+                    elif "attestation_result" in content_json:
+                        result = content_json["attestation_result"]
+                        print(f"DEBUG _extract_submods_from_dict: Found 'attestation_result' in content_json")
+                    elif "jwt" in content_json:
+                        result = content_json["jwt"]
+                        print(f"DEBUG _extract_submods_from_dict: Found 'jwt' in content_json")
+                    # If the entire content is a JWT (very unlikely but possible)
+                    elif isinstance(content_json, str) and content_json.count('.') == 2:
+                        result = content_json
+                        print(f"DEBUG _extract_submods_from_dict: Content itself is JWT")
+                
+                # Update the response_data to use the parsed content for further processing
+                if result is not None:
+                    response_data = content_json
+                        
+            except (json.JSONDecodeError, UnicodeDecodeError, KeyError) as e:
+                print(f"DEBUG _extract_submods_from_dict: Error parsing _content: {e}")
+        
+        print(f"DEBUG _extract_submods_from_dict: response_data preview: {str(response_data)[:500]}...")
+    else:
+        print(f"DEBUG _extract_submods_from_dict: response_data content: {str(response_data)[:500]}...")
+    
+    # Try different ways to extract the result (original logic as fallback)
+    if result is None and isinstance(response_data, dict):
         # Try the standard "result" key
         if "result" in response_data:
             result = response_data["result"]
@@ -193,11 +241,19 @@ def _extract_submods_from_dict(response_data, key_file):
         # Check if the response_data itself might be the JWT token
         elif isinstance(response_data.get('body'), str) and response_data['body'].count('.') == 2:
             result = response_data['body']
+        # Check if any value in the response looks like a JWT
+        else:
+            for key, value in response_data.items():
+                if isinstance(value, str) and value.count('.') == 2:
+                    result = value
+                    print(f"DEBUG _extract_submods_from_dict: Found JWT-like value in key '{key}'")
+                    break
     elif isinstance(response_data, str) and response_data.count('.') == 2:
         # It might be a JWT token itself
         result = response_data
     
     if result is None:
+        print(f"DEBUG _extract_submods_from_dict: No attestation result found in response")
         raise ValueError("Did not receive an attestation result.")
 
     with open(key_file) as fh:
