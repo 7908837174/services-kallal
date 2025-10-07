@@ -9,11 +9,15 @@ variables:
   nonce32:
     value: QUp8F0FBs9DpodKK8xUg8NQimf6sQAfe2J1ormzZLxk=
     size: 32
-    bad-value: deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdea=
+    bad-value: ZGVhZGJlZWZkZWFkYmVlZmRlYWRiZWVmZGVhZGJlZWZkZWE=
+  nonce32:
+    value: QUp8F0FBs9DpodKK8xUg8NQimf6sQAfe2J1ormzZLxk=
+    size: 32
+    bad-value: ZGVhZGJlZWZkZWFkYmVlZmRlYWRiZWVmZGVhZGJlZWZkZWE=
   nonce64:
     value: byTWuWNaLIu_WOkIuU4Ewb-zroDN6-gyQkV4SZ_jF2Hn9eHYvOASGET1Sr36UobaiPU6ZXsVM1yTlrQyklS8XA==
     size: 64
-    bad-value: deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbe==
+    bad-value: ZGVhZGJlZWZkZWFkYmVlZmRlYWRiZWVmZGVhZGJlZWZkZWFkYmVlZmRlYWRiZWVmZGVhZGJlZWZkZWFkYmVlZmRlYWRiZWVmZGVhZGJlPQ==
 
   bad-nonce: Ppfdfe2JzZLOk=
   endorsements-content-types:

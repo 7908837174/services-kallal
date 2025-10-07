@@ -56,6 +56,7 @@ RUN pip install --upgrade pip &&  \
                 ipdb==0.13.11
 
 ADD gen-enacttrust-token evcli cocli run-tests /home/tavern/.local/bin/
+RUN chmod +x /home/tavern/.local/bin/*
 ADD bashrc /home/tavern/.bashrc
 
 ENTRYPOINT ["/home/tavern/.local/bin/run-tests"]
