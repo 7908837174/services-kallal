@@ -136,9 +136,9 @@ def compare_to_expected_result(response, expected, verifier_key):
             assert expected_value == tc_value, f'mismatch for claim "{trust_claim}", for {key}'
 
         if "ear.veraison.annotated-evidence" in expected_claims:
-            # Normalize base64 formats for consistent comparison
+            # Normalize base64 formats for consistent comparison - both actual and expected
             actual_evidence = normalize_base64_to_urlsafe(decoded_claims["ear.veraison.annotated-evidence"])
-            expected_evidence = expected_claims["ear.veraison.annotated-evidence"]
+            expected_evidence = normalize_base64_to_urlsafe(expected_claims["ear.veraison.annotated-evidence"])
             assert actual_evidence == expected_evidence
 
         if "ear.veraison.policy-claims" in expected_claims:
