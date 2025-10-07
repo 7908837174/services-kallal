@@ -29,8 +29,21 @@ def save_result(response, scheme, evidence):
                 result = response_json["attestation_result"]
             elif "jwt" in response_json:
                 result = response_json["jwt"]
+            # Handle case where response itself might be the JWT (for direct body responses)
+            elif isinstance(response_json, str) and response_json.count('.') == 2:
+                result = response_json
+        
+        # If still no result, check if the entire response is a JWT token string
+        if result is None and hasattr(response, 'text'):
+            response_text = response.text.strip()
+            if response_text.count('.') == 2:  # JWT format check
+                result = response_text
         
         if result is None:
+            # Provide more debugging information
+            print(f"DEBUG: Response keys: {list(response_json.keys()) if isinstance(response_json, dict) else 'Not a dict'}")
+            print(f"DEBUG: Response type: {type(response_json)}")
+            print(f"DEBUG: Response content preview: {str(response_json)[:200]}...")
             raise ValueError("Did not receive an attestation result.")
             
     except (KeyError, AttributeError, TypeError) as e:
