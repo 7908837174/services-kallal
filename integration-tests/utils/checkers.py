@@ -59,6 +59,24 @@ def save_result(response, scheme, evidence):
         json.dump(decoded, wfh, indent=4)
 
 
+def normalize_base64_to_urlsafe(data):
+    """
+    Recursively convert all standard base64 strings to URL-safe base64 format
+    to ensure consistent comparison between evidence and expected results.
+    """
+    if isinstance(data, str):
+        # Check if this looks like a base64 string (contains + or / chars)
+        if ('+' in data or '/' in data) and (data.endswith('=') or data.endswith('==')):
+            # Convert standard base64 to URL-safe base64
+            return data.replace('+', '-').replace('/', '_')
+        return data
+    elif isinstance(data, dict):
+        return {key: normalize_base64_to_urlsafe(value) for key, value in data.items()}
+    elif isinstance(data, list):
+        return [normalize_base64_to_urlsafe(item) for item in data]
+    else:
+        return data
+
 def compare_to_expected_result(response, expected, verifier_key):
     # Handle Box objects (which Tavern uses internally)
     if hasattr(response, 'to_dict'):
@@ -118,8 +136,10 @@ def compare_to_expected_result(response, expected, verifier_key):
             assert expected_value == tc_value, f'mismatch for claim "{trust_claim}", for {key}'
 
         if "ear.veraison.annotated-evidence" in expected_claims:
-            assert decoded_claims["ear.veraison.annotated-evidence"] == \
-            expected_claims["ear.veraison.annotated-evidence"]
+            # Normalize base64 formats for consistent comparison
+            actual_evidence = normalize_base64_to_urlsafe(decoded_claims["ear.veraison.annotated-evidence"])
+            expected_evidence = expected_claims["ear.veraison.annotated-evidence"]
+            assert actual_evidence == expected_evidence
 
         if "ear.veraison.policy-claims" in expected_claims:
             assert decoded_claims["ear.veraison.policy-claims"] == \
