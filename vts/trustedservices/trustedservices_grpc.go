@@ -428,21 +428,13 @@ func (o *GRPC) GetAttestation(
 		return o.finalize(appraisal, err)
 	}
 
-	// Filter out empty reference IDs (can occur when no software components are provisioned)
-	filteredReferenceIDs := make([]string, 0, len(referenceIDs))
-	for _, refID := range referenceIDs {
-		if refID != "" {
-			filteredReferenceIDs = append(filteredReferenceIDs, refID)
-		}
-	}
-
 	appraisal.EvidenceContext.Evidence, err = structpb.NewStruct(claims)
 	if err != nil {
 		err = fmt.Errorf("unserializable claims in result: %w", err)
 		return o.finalize(appraisal, err)
 	}
 
-	appraisal.EvidenceContext.ReferenceIds = filteredReferenceIDs
+	appraisal.EvidenceContext.ReferenceIds = referenceIDs
 
 	o.logger.Debugw("constructed evidence context",
 		"software-id", appraisal.EvidenceContext.ReferenceIds,
@@ -509,12 +501,12 @@ func (c *GRPC) getTrustAnchors(id []string) ([]string, error) {
 	for _, taID := range id {
 		values, err := c.TaStore.Get(taID)
 		if err != nil {
-			return []string{""}, err
+			return nil, err
 		}
 
 		// For now, Veraison schemes only support one trust anchor per trustAnchorID
 		if len(values) != 1 {
-			return []string{""}, fmt.Errorf("found %d trust anchors, want 1", len(values))
+			return nil, fmt.Errorf("found %d trust anchors, want 1", len(values))
 		}
 		taValues = append(taValues, values[0])
 	}
